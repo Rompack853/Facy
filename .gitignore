@@ -1,0 +1,11 @@
+
+*.o
+*.idx
+*.json
+*.stash
+build-Facy-Desktop-Debug/Facy
+build-Facy-Desktop-Debug/Makefile
+*.cpp
+*.h
+*.user
+*.user
