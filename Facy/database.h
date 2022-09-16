@@ -6,6 +6,10 @@ class Database
 {
 public:
     Database();
+
+    bool verbindungAufbauen();
+    void verbindungSchliessen();
+    void ausfuehren();
 };
 
 #endif // DATABASE_H
