@@ -5,7 +5,8 @@
 *.stash
 build-Facy-Desktop-Debug/Facy
 build-Facy-Desktop-Debug/Makefile
-*.cpp
-*.h
 *.user
 *.user
+build-Facy-Desktop-Debug/moc_predefs.h
+build-Facy-Desktop-Debug/moc_frmmain.cpp
+build-Facy-Desktop-Debug/ui_frmmain.h

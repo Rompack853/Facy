@@ -1,5 +1,9 @@
 #include "user.h"
 
+//#########################
+//VOLLSTAENDIG FERTIG
+//#########################
+
 User::User(QString username, QString secret)
 {
     this->username = username;

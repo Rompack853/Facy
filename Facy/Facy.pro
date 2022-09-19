@@ -1,5 +1,6 @@
 QT       += core gui
 QT       += sql
+QT       += network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -11,19 +12,27 @@ CONFIG += c++17
 
 SOURCES += \
     admin.cpp \
+    connection.cpp \
     controller.cpp \
     database.cpp \
+    group.cpp \
+    highscores.cpp \
     main.cpp \
     frmmain.cpp \
+    score.cpp \
     server.cpp \
     user.cpp
 
 HEADERS += \
     Role.h \
     admin.h \
+    connection.h \
     controller.h \
     database.h \
     frmmain.h \
+    group.h \
+    highscores.h \
+    score.h \
     server.h \
     user.h
 
