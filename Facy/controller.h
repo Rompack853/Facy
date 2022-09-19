@@ -7,6 +7,7 @@ class Controller
 {
 public:
     Controller();
+    ~Controller();
 
     void addUser(Role role, QString username, QString secret);
     void deleteUser(QString usernameToDelete, QString usernameExecuting);

@@ -39,28 +39,50 @@ bool Database::execute(QString sqlQuery){
     return success;
 }
 
+//Vollstaendig Fertig
 bool Database::addUser(User* user, Role role){
 
-    QString sqlBefehl;
+    QString sqlBefehl = "";
+    bool sqlExecution1 = false;
+    bool sqlExecution2 = false;
 
-    if(role == Role::USER)
+    if(role == Role::ADMIN){
         sqlBefehl = buildAddUserQuery(user);
-    else
+        sqlExecution1 = execute(sqlBefehl);
         sqlBefehl = buildAddAdminQuery(user);
+        sqlExecution2 = execute(sqlBefehl);
 
-    return execute(sqlBefehl);
-}
+        //wenn der Admin erolgreich in die Datenbank geschrieben wurden,
+        //soll true return werden
+        return (sqlExecution2 && sqlExecution1) == true;
+    }//if
+    else{
+        sqlBefehl = buildAddUserQuery(user);
+        //wenn der User erolgreich in die Datenbank geschrieben wurden,
+        //soll true return werden
+        return execute(sqlBefehl);
+    }//else
+}//addUser();
 
+
+//Vollstaendig Fertig
 QString Database::buildAddAdminQuery(User* user){
 
-    QString sqlBefehl = ""; //TODO
+    //Traegt in die Tabelle Admin die ID des Users ein.
 
+    QString sqlBefehl = "INSERT INTO Admin (id) "
+                        "VALUES ((SELECT id "
+                                  "FROM User "
+                                  "WHERE username = '" +user->getUsername()+ "'));"; //TODO
     return sqlBefehl;
 }
 
+
+//Vollstaendig Fertig
 QString Database::buildAddUserQuery(User* user){
 
-    QString sqlBefehl = ""; //TODO
-
+    //Tragat in die Tabelle des Users die Values für den Username und das Passwort ein.
+    QString sqlBefehl = "INSERT INTO User (username, secret) "
+                        "VALUES ('" + user->getUsername() + "', '" + user->getSecret() + "');"; //TODO
     return sqlBefehl;
 }
