@@ -25,6 +25,7 @@ Controller::~Controller(){
  */
 void Controller::setup(){
     qDebug()<<"Database found & Connected: "<<database.connect();
+    loadGroups();
 }
 
 //==============ADD-DATA================

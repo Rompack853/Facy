@@ -230,7 +230,7 @@ QList<Group*> Database::loadGroups(){
         name = qry.value(0).toString();         //loads the groups name
         description = qry.value(1).toString();  //loads the groups description
         dirPath = qry.value(2).toString();      //loads the groups directory Path (more information in the Group class)
-        group = new Group(name, description, dirPath);
+        group = new Group(name, dirPath, description);
         groups.append(group);
 
         success = qry.next();

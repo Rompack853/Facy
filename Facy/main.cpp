@@ -38,13 +38,14 @@ int main(int argc, char *argv[])
                         "Können, Lebensweisheit, Ausbildung oder Bildung befindet.");*/
 
     //---Test - Loading groups from Database---
-    //TODO
+    //Working!
 
     //---Test - Writing list of highscores to Database---
     //TODO
 
     //---Test - Loading list of highscores from Database---
-    //TODO
+    //TODO,
+
 
     //---Test - Creating Directories in Filesystem---
     //Filesystem::getInstance()->createNewGroupDir("Testordner123");
