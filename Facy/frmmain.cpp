@@ -12,4 +12,3 @@ FrmMain::~FrmMain()
 {
     delete ui;
 }
-

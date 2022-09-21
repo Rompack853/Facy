@@ -124,7 +124,7 @@ bool Database::addUser(User* user, Role role){
  */
 bool Database::addGroup(Group* group){
 
-    QString sqlBefehl = "INSERT INTO Group (name, dir_path, description) "
+    QString sqlBefehl = "INSERT INTO Stereotype (name, dir_path, description) "
                         "VALUES ('" + group->getName() + "', '" + group->getDirPath() + "', '" + group->getDescription() + "');";
 
     return execute(sqlBefehl);
@@ -137,12 +137,12 @@ bool Database::addGroup(Group* group){
  */
 bool Database::addHighscore(Score* score){
 
-    QString sqlBefehl = "INSERT INTO Scoreboard (id_user, id_group, highscore) "
-                        "VALUES ( (SELECT id"
-                                  "FROM User"
-                                  "WHERE username = '"+ score->getUser()->getUsername() + "'), (SELECT id"
-                                                                                               "FROM Group"
-                                                                                              "WHERE name = '" + score->getGroup()->getName() + "'), '" + score->getScore() + "');";
+    QString sqlBefehl = "INSERT INTO Scoreboard (id_user, id_stereotype, highscore) "
+                        "VALUES ( (SELECT id "
+                                  "FROM User "
+                                  "WHERE username = '"+ score->getUser()->getUsername() + "'), (SELECT id "
+                                                                                               "FROM Group "
+                                                                                               "WHERE name = '" + score->getGroup()->getName() + "'), '" + score->getScore() + "');";
     return execute(sqlBefehl);
 }
 
@@ -222,7 +222,7 @@ QList<Group*> Database::loadGroups(){
     bool success = false;
     QSqlQuery qry;
     QString sqlBefehl = "SELECT name, description, dir_path "
-                        "FROM Group;";
+                        "FROM Stereotype;";
 
     qry.exec(sqlBefehl); //execute SQLStatement
     success = qry.first(); //get first Returned value
@@ -267,8 +267,8 @@ QString Database::buildAddAdminQuery(User* user){
 
     QString sqlBefehl = "INSERT INTO Admin (id) "
                         "VALUES ((SELECT id "
-                                  "FROM User "
-                                  "WHERE username = '" +user->getUsername()+ "'));";
+                                 "FROM User "
+                                 "WHERE username = '" + user->getUsername()+ "'));";
     return sqlBefehl;
 }
 

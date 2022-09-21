@@ -15,6 +15,7 @@ SOURCES += \
     connection.cpp \
     controller.cpp \
     database.cpp \
+    filesystem.cpp \
     group.cpp \
     highscores.cpp \
     main.cpp \
@@ -29,6 +30,7 @@ HEADERS += \
     connection.h \
     controller.h \
     database.h \
+    filesystem.h \
     frmmain.h \
     group.h \
     highscores.h \

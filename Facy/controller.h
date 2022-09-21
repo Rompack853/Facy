@@ -3,6 +3,7 @@
 #include <QWidget>
 #include "database.h"
 #include "server.h"
+#include "filesystem.h"
 
 class Controller
 {

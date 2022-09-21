@@ -53,10 +53,18 @@ void Controller::addUser(Role role, QString username, QString secret){
  */
 void Controller::addGroup(QString name, QString dirPath, QString description){
 
+    bool success = false;
+
     Group* group = new Group(name, dirPath, description);
     groups.append(group);
 
-    qDebug() << "Writhing " << name << " to Database successful: " << database.addGroup(group);
+    success = database.addGroup(group);
+
+    qDebug() << "Writing " << name << " to Database successful: " << success;
+
+    if(success){
+        Filesystem::getInstance()->createNewGroupDir(name);
+    }//if adding Group to Database was successful -> create a directory for the groups images
 }
 
 /**
