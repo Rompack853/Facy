@@ -10,10 +10,17 @@ public:
     Controller();
     ~Controller();
 
-    void addUser(Role role, QString username, QString secret);
+    //===========ADD-DATA================
+    void addUser(Role role, QString username, QString secret); //FERTIG
     void addGroup(QString name, QString dirPath, QString description);
     void addHighscore(User* user, Group* group, int score);
 
+    //========LOAD-FROM-DATABASE=========
+    bool loadUser(QString username); //FERTIG
+    void loadGroups();
+    bool loadHighscores();
+
+    //=========DELETE-DATA===============)
     void deleteUser(QString usernameToDelete, QString usernameExecuting);
     void deleteGroup(); //TODO
     void deleteHighscore(); //TODO
@@ -32,7 +39,10 @@ private:
 
     Database database;
 
-    User* getUserByName(QString username);
+    User* getUserByName(QString username); //TODO Test
+
+    void print(QString message); //Fertig
+
 
     void setup();
 };

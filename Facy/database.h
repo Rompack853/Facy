@@ -14,12 +14,12 @@ class Database
 {
 public:
     //constuctor
-    Database();
+    Database(); //FERTIG
 
     //===========CONNECTION==========
     //Methods
-    bool connect();
-    void closeConnection();
+    bool connect(); //FERTIG
+    void closeConnection(); //FERTIG
 
     //========DATEN SCHREIBEN========
     //Also Admins are processed here
@@ -28,18 +28,18 @@ public:
     bool addGroup(Group* group); //TODO Testen of funktionsfähig
 
     //===========DATEN LESEN=========
-    QList<User*> loadUsers(); //TODO
+    User* loadUser(QString username); //FERTIG
     QList<Group*> loadGroups(); //TODO
-    Highscores loadHighscores(); //TODO
+    Highscores* loadHighscores(); //TODO
 
 private:
 
     //Methods
-    bool execute(QString query);
-
+    bool execute(QString query); //FERTIG
+    void printError(QSqlQuery qry); //FERTIG
     //==========LOGIC===============
-    QString buildAddAdminQuery(User* user);
-    QString buildAddUserQuery(User* user);
+    QString buildAddAdminQuery(User* user); //FERTIG
+    QString buildAddUserQuery(User* user); //FERTIG
 
     //==============================
 

@@ -27,6 +27,8 @@ void Controller::setup(){
     qDebug()<<"Database found & Connected: "<<database.connect();
 }
 
+//==============ADD-DATA================
+
 /**
  * @brief Controller::addUser
  * @param role
@@ -77,3 +79,63 @@ void Controller::addHighscore(User* user, Group* group, int score){
     }//if new highscore hasn't been set
 
 }//addHighscore()
+
+//============GET-DATA============
+
+User* Controller::getUserByName(QString username){
+
+    //TODO
+    return nullptr;
+}
+
+//============LOAD-DATA===========
+
+/**
+ * Loads a User spezified by the username parameter from the Database
+ * @brief Controller::loadUser
+ * @param username
+ * @return bool if the User has been found & loaded
+ */
+bool Controller::loadUser(QString username){
+
+    bool userAlreadyLoaded = false;
+
+    for(User* user: users){
+        if(user->getUsername() == username){
+            userAlreadyLoaded = true;
+            print("User already exists.");
+            break;
+        }//if
+    }//for
+
+    if(!userAlreadyLoaded){
+        users.append(database.loadUser(username));
+        print("User/Admin loaded");
+        return true;
+    }//if user not loaded yet
+    return false;
+}//loadUser()
+
+/**
+ * Calling this Methods overrides the current state of the Group-List with the state of the Database
+ * @brief Controller::loadGroups
+ * @return
+ */
+void Controller::loadGroups(){
+
+    //TODO maybe outsource the returned list of groups in a temporary list and compare the entrys to the current list
+    //just load those that are new
+    groups = database.loadGroups();
+    print("Groups loaded");
+}
+
+//============More================
+
+/**
+ * Prints a specified message in the Console
+ * @brief Controller::print
+ * @param message
+ */
+void Controller::print(QString message){
+    qDebug() << message;
+}

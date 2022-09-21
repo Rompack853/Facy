@@ -10,8 +10,38 @@ int main(int argc, char *argv[])
 
     Controller controller;
     //DELETE==========
-    controller.addUser(Role::USER, "Fsociety", "Password123");
-    controller.addUser(Role::ADMIN, "ChuckNorris", "psswrd");
+    //---Test - Writing users to Database---
+    //controller.addUser(Role::USER, "Fsociety", "Password123");
+    //controller.addUser(Role::ADMIN, "ChuckNorris", "psswrd");
+    //---Test - Loading Users from Database---
+    //for(int i=0; i<3; i++){
+        //controller.loadUser("ChuckNorris");
+    //}//for 3 cycles
+    //---Test - Writing groups to Databse---
+    /*controller.addGroup("Sportler/Sportlerinnen",
+                        "Als Sportler oder Sportlerin wird"
+                        "eine Person bezeichnet, die regelmäßig"
+                        "und intensiv eine oder mehrere"
+                        "Sportarten betreibt.",
+                        "");
+    controller.addGroup("Lehrer/Lehrerinnen",
+                        "Ein Lehrer oder eine Lehrerin ist eine Person,"
+                        "die andere Personen auf einem Gebiet"
+                        "weiterbildet, auf dem sie selber einen"
+                        "Vorsprung an Können, Wissen oder Erfahrung hat."
+                        "Da es sich um keine geschützte Bezeichnung handelt,"
+                        "kann sich grundsätzlich jede Person so nennen,"
+                        "die sich in einer Phase der Vermittlung von Wissen,"
+                        "Können, Lebensweisheit, Ausbildung oder Bildung befindet.",
+                        "");*/
+    //---Test - Loading groups from Database---
+
+    //---Test - Writing list of highscores to Database---
+    //TODO
+    //---Test - Loading list of highscores from Database---
+    //TODO
+
+
     //DELETE=========
     return a.exec();
 }

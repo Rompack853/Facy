@@ -148,9 +148,109 @@ bool Database::addHighscore(Score* score){
 
 //===================GET-METHODS===================
 
+//Vollstaendig fertig
+/**
+ * Loads a user from the Database
+ * @brief Database::loadUser
+ * @param username
+ * @return
+ */
+User* Database::loadUser(QString username){
 
+    bool success = false;
+    User* user = nullptr;
+    QString secret = "";
+    QString id = "";
+    QSqlQuery qry;
 
+    QString sqlBefehl = "SELECT id, username, secret "
+                        "FROM User "
+                        "WHERE username = '" + username + "'";
 
+    success = qry.exec(sqlBefehl);
+
+    qDebug() << "Load User query correct: " << success << "\nSQLQuery:" << sqlBefehl;
+
+    if (success){
+        success = qry.first(); //auf erste Zeile springen
+        if(success){
+            qDebug() << "Load User successful: " << success;
+            id = qry.value(0).toString();
+            username = qry.value(1).toString();
+            secret = qry.value(2).toString();
+
+            user = new User(username, secret);
+
+            sqlBefehl = "SELECT * "
+                        "FROM Admin "
+                        "WHERE id = " + id;
+
+            qDebug() << "\nSQLQuery:" << sqlBefehl;
+
+            success = qry.exec(sqlBefehl);
+            if(success){
+                qDebug() << "Load Admin query correct: " << success;
+                success = qry.first();
+                if(success){
+                    qDebug() << "Load Admin successful: " << success;
+                    user = new Admin(username, secret);
+                }//if finding entry successful
+            }//if query execution successful
+        }//if success
+    }//if finding user successful
+
+    if(user == nullptr){
+        printError(qry);
+    }//wenn kein User gefunden wurde wird der letzt Fehler in der Konsole ausgegeben
+
+    return user;
+}//loadUser()
+
+/**
+ * Loads all Groups from the Database
+ * @brief Database::loadGroups
+ * @return
+ */
+QList<Group*> Database::loadGroups(){
+
+    Group* group = nullptr; //cache for all group objects
+    QString name = "";
+    QString description = "";
+    QString dirPath = "";
+    QList<Group*> groups; //Final List of groups that gets returnt in the end
+
+    bool success = false;
+    QSqlQuery qry;
+    QString sqlBefehl = "SELECT name, description, dir_path "
+                        "FROM Group;";
+
+    qry.exec(sqlBefehl); //execute SQLStatement
+    success = qry.first(); //get first Returned value
+    while (success) {
+        name = qry.value(0).toString();         //loads the groups name
+        description = qry.value(1).toString();  //loads the groups description
+        dirPath = qry.value(2).toString();      //loads the groups directory Path (more information in the Group class)
+        group = new Group(name, description, dirPath);
+        groups.append(group);
+
+        success = qry.next();
+    }//while database returns data
+
+    return groups;
+}
+
+Highscores* Database::loadHighscores(){
+
+    bool success = false;
+    Highscores* highscores = nullptr;
+    Score* score = nullptr;
+    QSqlQuery qry;
+    QString sqlBefehl = "";
+
+    success = qry.exec(sqlBefehl);
+
+    return highscores; //TODO
+}
 
 //===================BUILD-QUERY-METHODS===================
 
@@ -186,4 +286,13 @@ QString Database::buildAddUserQuery(User* user){
     QString sqlBefehl = "INSERT INTO User (username, secret) "
                         "VALUES ('" + user->getUsername() + "', '" + user->getSecret() + "');";
     return sqlBefehl;
+}
+
+/**
+ * Shows the last error of the sqlExecution in the Console
+ * @brief Datenbank::printError
+ * @param qry
+ */
+void Database::printError(QSqlQuery qry){
+    qDebug()<<qry.lastError().text(); //SQL-Fehler anzeigen
 }
