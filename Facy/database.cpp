@@ -141,12 +141,66 @@ bool Database::addHighscore(Score* score){
                         "VALUES ( (SELECT id "
                                   "FROM User "
                                   "WHERE username = '"+ score->getUser()->getUsername() + "'), (SELECT id "
-                                                                                               "FROM Group "
-                                                                                               "WHERE name = '" + score->getGroup()->getName() + "'), '" + score->getScore() + "');";
+                                                                                               "FROM Stereotype "
+                                                                                               "WHERE name = '" + score->getGroup()->getName() + "'), " + QString::number(score->getScore()) + ");";
     return execute(sqlBefehl);
 }
 
 //===================GET-METHODS===================
+
+QList<User*> Database::loadAllUsers(){
+
+    bool success = false;
+    User* user = nullptr;
+    QList<User*> users;
+    QString username = "";
+    QString secret = "";
+    QString id = "";
+    QSqlQuery qry;
+    QSqlQuery qry2;
+
+    QString sqlBefehl = "SELECT id, username, secret "
+                        "FROM User";
+
+    success = qry.exec(sqlBefehl);
+
+    qDebug() << "Load AllUsers query correct: " << success << "\nSQLQuery:" << sqlBefehl;
+
+    if (success){
+        success = qry.first(); //auf erste Zeile springen
+        while(success){
+            id = qry.value(0).toString();
+            username = qry.value(1).toString();
+            secret = qry.value(2).toString();
+
+            user = new User(username, secret);
+
+            sqlBefehl = "SELECT * "
+                        "FROM Admin "
+                        "WHERE id = " + id;
+
+            qDebug() << "\nSQLQuery:" << sqlBefehl;
+
+            success = qry2.exec(sqlBefehl);
+            if(success){
+                qDebug() << "Load Admin query correct: " << success;
+                success = qry2.first();
+                if(success){
+                    qDebug() << "Load Admin successful: " << success;
+                    user = new Admin(username, secret);
+                }//if finding entry successful
+            }//if query execution successful
+            users.append(user);
+            success = qry.next();
+        }//while success
+    }//if finding user successful
+
+    if(user == nullptr){
+        printError(qry);
+    }//wenn kein User gefunden wurde wird der letzt Fehler in der Konsole ausgegeben
+
+    return users;
+}
 
 //Vollstaendig fertig
 /**
@@ -242,12 +296,28 @@ QList<Group*> Database::loadGroups(){
 Highscores* Database::loadHighscores(){
 
     bool success = false;
-    Highscores* highscores = nullptr;
+    Highscores* highscores = new Highscores();
     Score* score = nullptr;
+    User* user = nullptr;
+    Group* group = nullptr;
     QSqlQuery qry;
-    QString sqlBefehl = "";
+    QString sqlBefehl;
+    sqlBefehl = "SELECT User.username, Stereotype.name, Scoreboard.highscore "
+                "FROM User, Stereotype, Scoreboard "
+                "WHERE User.id = Scoreboard.id_user "
+                "AND Stereotype.id = Scoreboard.id_stereotype";
 
     success = qry.exec(sqlBefehl);
+    if(success){
+        success = qry.first();
+        while(success){
+            user = new User(qry.value(0).toString(), "");
+            group = new Group(qry.value(1).toString(), "", "");
+            score = new Score(user, group, qry.value(2).toInt());
+            highscores->addHighscore(score);
+            success = qry.next();
+        }//while success
+    }//if success
 
     return highscores; //TODO
 }

@@ -9,6 +9,7 @@ class Filesystem
 public:
     static Filesystem* getInstance();
     bool createNewGroupDir(QString groupName);
+    QString getFullPathOfDir(QString dirName);
 private:
 
     Filesystem();

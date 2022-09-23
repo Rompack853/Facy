@@ -1,0 +1,29 @@
+Funktionalität - Benutzter authentifizierung
+
+Beim Start des Programms werden keine Benutzter aus der Datenbank geladen.
+Dies geschieht nur auf bedarf. Möchte sich ein User beispielsweise anmelden,
+so werden die Credentials nach eingabe in den Client an den Server geschickt.
+Findet der Server einen User unter dem spezifizierten username, werden die
+Passwörter überprüft. Stimmten diese überein, erhält der User zugriff auf das
+Objekt. Falls die Zugangsdaten nicht stimmen, wird der Eintrag entweder nicht
+in der Datenbank gefunden oder bei überprüft der Passphrase eine
+Unstimmigkeit festgestellt. In letzterem Fall erhält der Client keinen Zugriff
+auf den User.
+
+Funktionalität - Benutzer authorisierung
+
+Konzeptionell besteht die Idee, dass man für bestimmte/alle Funktionen im Client
+z.B. anhand eines Enums (dessen Einträge man zahlenwerte gibt) eine mindest
+Berechtigung festlegt, die bestehen muss um diese auszuführen. Hierbei könnte zu
+Beginn der Funktion immer beim Server nachgefragt werden, wie hoch das
+Berechtigungslevel des Users ist und dann mit der Mindesberechtigung verglichen
+werden.
+
+Funktionalität - Highscore hinzufuegen
+
+Wird eine gespielte Runde beendet, so wird die Punktzahl der Siegers (Spielers
+mit der hösten erreichten Punkzahl) ODER aller Spieler an den Server übermittelt.
+dieser versucht die Einträge als neuen Highscore zu registrieren. Die Klasse
+'Highscores' (SERVER) überprüft automatisch beim Erstellen eines Eintrags, ob es
+sich um einen Highscore handelt oder bereits ein höherer Rekord besteht.
+Abhängig davon wird der übermittelte score entweder eingetragen oder nicht.

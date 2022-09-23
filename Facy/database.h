@@ -10,40 +10,34 @@
 #include "Role.h"
 #include <sqlite3.h>
 
-class Database
+class Database : public QObject
 {
 public:
-    //constuctor
-    Database(); //FERTIG
-
+    Database();                             //FERTIG
     //===========CONNECTION==========
-    //Methods
-    bool connect(); //FERTIG
-    void closeConnection(); //FERTIG
-
+    bool connect();                         //FERTIG
+    void closeConnection();                 //FERTIG
     //========DATEN SCHREIBEN========
     //Also Admins are processed here
-    bool addUser(User* user, Role role); //FERTIG
-    bool addHighscore(Score* score); //TODO überlege ob (DELETE && INSERT INTO) oder UPDATE genutzt werden soll um neue Werte einzutragen/alte zu bearbeiten
-    bool addGroup(Group* group); //TODO Testen of funktionsfähig
-
+    bool addUser(User* user, Role role);    //FERTIG
+    bool addHighscore(Score* score);        //FERTIG
+    bool addGroup(Group* group);            //FERTIG
     //===========DATEN LESEN=========
-    User* loadUser(QString username); //FERTIG
-    QList<Group*> loadGroups(); //TODO
-    Highscores* loadHighscores(); //TODO
+    QList<User*> loadAllUsers();
+    User* loadUser(QString username);       //FERTIG
+    QList<Group*> loadGroups();             //FERTIG
+    Highscores* loadHighscores();           //FERTIG
 
 private:
 
-    //Methods
-    bool execute(QString query); //FERTIG
-    void printError(QSqlQuery qry); //FERTIG
     //==========LOGIC===============
     QString buildAddAdminQuery(User* user); //FERTIG
-    QString buildAddUserQuery(User* user); //FERTIG
+    QString buildAddUserQuery(User* user);  //FERTIG
 
-    //==============================
+    bool execute(QString query);            //FERTIG
+    void printError(QSqlQuery qry);         //FERTIG
 
-    //Attributes
+    //==========Attributes==========
     QSqlDatabase db;
     //sqlite3* db;
 

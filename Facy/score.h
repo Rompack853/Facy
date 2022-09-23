@@ -7,7 +7,7 @@
 class Score
 {
 public:
-    Score(User* user, Group* group, int score=0);
+    Score(User* user, Group* group, int score);
 
     User* getUser();
     Group* getGroup();

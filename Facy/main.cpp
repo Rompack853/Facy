@@ -41,11 +41,20 @@ int main(int argc, char *argv[])
     //Working!
 
     //---Test - Writing list of highscores to Database---
-    //TODO
-
+    //Adding a highscore With a User that doesn't exist
+    //controller.addHighscore("LolloRosso", "SportlerInnen", 5);
+    //qDebug() << "Test 1: finished";
+    //Adding a highscore With a Group that doesn't exist
+    //controller.addHighscore("Fsociety", "Nerds", 100);
+    //qDebug() << "Test 2: finished";
+    //Adding a highscore With a crazy score (below zero or of extreme size)
+    //controller.addHighscore("Fsociety", "SportlerInnen", -4);
+    //qDebug() << "Test 3: finished";
+    //Overriding a highscore of the same group and a different User
+    //controller.addHighscore("ChuckNorris", "SportlerInnen", 7);
+    //qDebug() << "Test 4: finished";
     //---Test - Loading list of highscores from Database---
     //TODO,
-
 
     //---Test - Creating Directories in Filesystem---
     //Filesystem::getInstance()->createNewGroupDir("Testordner123");

@@ -43,3 +43,46 @@ void Highscores::deleteScore(Score* score){
 
     scores.removeAll(score);
 }
+
+//=========EDIT-INTERNAL-LIST================
+
+/**
+ * To Get a specific Score at the specified index
+ * @brief Highscores::getElementByID
+ * @param i
+ * @return Score* score
+ */
+Score* Highscores::getElementByID(int i){
+
+    return scores.at(i);
+}
+
+/**
+ * Returns the lenght of the List
+ * @brief Highscores::getLength
+ * @return int length
+ */
+int Highscores::getLength(){
+
+    return scores.length();
+}
+
+/**
+ * Replaces the current object at index i with the specified Object (which is the second parameter)
+ * @brief Highscores::replace
+ * @param i
+ * @param newScore
+ */
+void Highscores::replace(int i, Score* newScore){
+    scores.replace(i, newScore);
+}
+
+/**
+ * return the index of an Object in the list
+ * @brief Highscores::indexOf
+ * @param score
+ * @return int
+ */
+int Highscores::indexOf(Score* score){
+    return scores.indexOf(score);
+}

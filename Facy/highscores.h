@@ -8,13 +8,17 @@ class Highscores
 public:
     //Constructor
     Highscores();
-
     //Add entry
     bool addHighscore(Score* score);
     //delete entry
     void deleteScore(Score* score);
     //get entry
-    //TODO
+
+    //======Edit-internal-List==========
+    Score* getElementByID(int i);
+    int getLength();
+    void replace(int index, Score* newScore);
+    int indexOf(Score* score);
 
 private:
     QList<Score*> scores;

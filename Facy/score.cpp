@@ -4,7 +4,7 @@
 //VOLLSTAENDIG FERTIG
 //#########################
 
-Score::Score(User* user, Group* group, int score)
+Score::Score(User* user, Group* group, int score=0)
 {
     this->user = user;
     this->group = group;
