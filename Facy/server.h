@@ -14,7 +14,7 @@ public:
 
 private slots:
 
-    void connect();
+    void buildConnection();
     void recieve(QObject* client);
 
 private:
@@ -22,7 +22,7 @@ private:
     QTcpServer* server;
     int port;
     QList<Connection*> connections;
-    QSignalMapper *signalMapper;
+    QSignalMapper* signalMapper;
 
     Connection* searchConnection(QTcpSocket* socket);
 
@@ -31,8 +31,7 @@ private:
     void sendUnicast(QString recieverID, QString message);
     void sendMulticast(QList<QString> recieverIDs, QString message);
     void sendBoradcast(QString message);
-
-
+    void unsubscribe(QTcpSocket* socket);
 };
 
 #endif // SERVER_H
