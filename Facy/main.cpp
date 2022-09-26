@@ -1,14 +1,15 @@
 #include "frmmain.h"
-#include "controller.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    //FrmMain w;
-    //w.show();
+    FrmMain w;
+    w.show();
 
-    Controller controller;
+    //delete server;
+
+
     //===============TESTING=====================
     //---Test - Writing users to Database---
     //controller.addUser(Role::USER, "Fsociety", "Password123");

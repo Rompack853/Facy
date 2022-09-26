@@ -2,7 +2,6 @@
 #define CONTROLLER_H
 #include <QWidget>
 #include "database.h"
-#include "server.h"
 #include "filesystem.h"
 
 class Controller : public QObject

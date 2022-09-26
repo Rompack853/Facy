@@ -1,18 +1,25 @@
 #include "server.h"
 
-//FERTIG
+/**
+ * Construnctor
+ * @brief Server::Server
+ * @param parent
+ * @param port
+ */
 Server::Server(QObject* parent, int port) : QObject(parent){
 
     this->port = port;  //setzte Port
     server = new QTcpServer(parent);    //erzeuge Server-Socket
     connect(server, SIGNAL(newConnection()), this, SLOT(buildConnection())); //verbinde newConnection des QTcpSockets mit buildConnection() dieser Klasse
-    server->listen(QHostAddress::Any, port); //konfiguriere empfangs-port
+    server->listen(QHostAddress::Any, port); //konfiguriere ip-adressen & empfangs-port fuer listener
     signalMapper = new QSignalMapper(this); //erzeuge Signalmapper
     connect(signalMapper, SIGNAL(mapped(QObject*)), this, SLOT(recieve(QObject*))); //verbinde mapped()-methode des SignalMappers mit recieve() dieser Klasse
-
 }
 
-//FERTIG
+/**
+ * Destructor
+ * @brief Server::~Server
+ */
 Server::~Server(){
     QString text = "bye";
     for(Connection* c: connections){
@@ -31,7 +38,7 @@ Server::~Server(){
  * @brief Server::buildConnection
  */
 void Server::buildConnection(){
-
+    qDebug() << "building connection...";
     QTcpSocket* client = server->nextPendingConnection();
     if(client){
         connections.append(new Connection("", client));
@@ -52,6 +59,8 @@ void Server::recieve(QObject* client){
     QString input = socket->readAll();
 
     //TODO Login
+    qDebug() << "input: " + input;
+
 }//recieve()
 
 //==============SLOTS==============end
@@ -63,7 +72,7 @@ void Server::recieve(QObject* client){
  * @return
  */
 Connection* Server::searchConnection(QTcpSocket* socket){
-
+    qDebug() << "searching connection";
     Connection* tmpConnection = 0; //creates temporary Connection
     for(Connection* c: connections){
         if(c->getSocket() == socket){
@@ -82,6 +91,7 @@ Connection* Server::searchConnection(QTcpSocket* socket){
  * @param message
  */
 void Server::send(QTcpSocket* socket, QString message){
+    qDebug() << "sending: " + message;
     socket->write(message.toLatin1());
 }//send()
 
@@ -92,6 +102,7 @@ void Server::send(QTcpSocket* socket, QString message){
  * @param message
  */
 void Server::sendUnicast(QString recieverID, QString message){
+    qDebug() << "sending to " + recieverID + ": " + message;
     for(Connection* c: connections){
         if(c->getID() == recieverID){
             c->getSocket()->write(message.toLatin1());
@@ -109,6 +120,7 @@ void Server::sendMulticast(QList<QString> recieverIDs, QString message){
    for(Connection* c: connections){
        for(QString id: recieverIDs){
            if(c->getID() == id){
+               qDebug() << "sending to " + id + ": " + message;
                c->getSocket()->write(message.toLatin1());
            }//if IDs match
        }//for id in recieverIDs
@@ -121,6 +133,7 @@ void Server::sendMulticast(QList<QString> recieverIDs, QString message){
  * @param message
  */
 void Server::sendBoradcast(QString message){
+    qDebug() << "sending (Broadcast): " + message;
     for(Connection* c: connections){
         c->getSocket()->write(message.toLatin1());
     }
@@ -132,6 +145,8 @@ void Server::sendBoradcast(QString message){
  * @param socket
  */
 void Server::unsubscribe(QTcpSocket* socket){
+
+    qDebug() << "unsubscribing socket...";
 
     for(Connection* c: connections){
         if(c->getSocket() == socket){

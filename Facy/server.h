@@ -2,6 +2,7 @@
 #define SERVER_H
 #include <QWidget>
 #include "connection.h"
+#include "controller.h"
 
 class Server : public QObject
 {
@@ -9,7 +10,7 @@ class Server : public QObject
 
 public:
 
-    Server(QObject *parent=0, int port=1001);
+    Server(QObject *parent=0, int port=8080);
     ~Server();
 
 private slots:
@@ -18,6 +19,8 @@ private slots:
     void recieve(QObject* client);
 
 private:
+
+    Controller controller;
 
     QTcpServer* server;
     int port;
