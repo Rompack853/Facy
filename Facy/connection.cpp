@@ -30,6 +30,5 @@ void Connection::setLoggedIn(bool loggedIn){
 
 QString Connection::generateRandomID(){
 
-    QCryptographicHash hash = QCryptographicHash(QCryptographicHash::Sha256);
-    return hash.result();
+    return QString::number(QRandomGenerator64::global()->generate(), 10);
 }

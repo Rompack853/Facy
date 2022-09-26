@@ -21,9 +21,8 @@ Server::Server(QObject* parent, int port) : QObject(parent){
  * @brief Server::~Server
  */
 Server::~Server(){
-    QString text = "bye";
+    sendBoradcast("CLOSED");
     for(Connection* c: connections){
-        c->getSocket()->write(text.toLatin1(), text.size());
         c->getSocket()->close();
         delete c;
     }//for c in connections
@@ -38,12 +37,18 @@ Server::~Server(){
  * @brief Server::buildConnection
  */
 void Server::buildConnection(){
-    qDebug() << "building connection...";
+    qDebug() << "[Server] building connection...";
+
     QTcpSocket* client = server->nextPendingConnection();
+    QString randomID = "";
+
     if(client){
-        connections.append(new Connection("", client));
+        randomID = Connection::generateRandomID();
+        connections.append(new Connection(randomID, client));
         connect(client, SIGNAL(readyRead()), signalMapper, SLOT(map()));
         signalMapper->setMapping(client, client);
+
+        send(client, "setID_" + randomID); //SENDS THE NEW GENERATED ID TO THE CLIENT
     }//if
 }//buildConnection()
 
@@ -58,8 +63,9 @@ void Server::recieve(QObject* client){
     Connection* tmpConnection = searchConnection(socket);
     QString input = socket->readAll();
 
-    //TODO Login
-    qDebug() << "input: " + input;
+    qDebug() << "[Server] recieved from ["+ tmpConnection->getID() +"]: " + input;
+
+    //TODO Implement Actions that should happen on specific messages
 
 }//recieve()
 
@@ -72,7 +78,7 @@ void Server::recieve(QObject* client){
  * @return
  */
 Connection* Server::searchConnection(QTcpSocket* socket){
-    qDebug() << "searching connection";
+    qDebug() << "[Server] searching connection";
     Connection* tmpConnection = 0; //creates temporary Connection
     for(Connection* c: connections){
         if(c->getSocket() == socket){
@@ -91,7 +97,7 @@ Connection* Server::searchConnection(QTcpSocket* socket){
  * @param message
  */
 void Server::send(QTcpSocket* socket, QString message){
-    qDebug() << "sending: " + message;
+    qDebug() << "[Server] sending to ["+ searchConnection(socket)->getID() +"]: " + message;
     socket->write(message.toLatin1());
 }//send()
 
@@ -102,7 +108,7 @@ void Server::send(QTcpSocket* socket, QString message){
  * @param message
  */
 void Server::sendUnicast(QString recieverID, QString message){
-    qDebug() << "sending to " + recieverID + ": " + message;
+    qDebug() << "[Server] sending to " + recieverID + ": " + message;
     for(Connection* c: connections){
         if(c->getID() == recieverID){
             c->getSocket()->write(message.toLatin1());
@@ -120,7 +126,7 @@ void Server::sendMulticast(QList<QString> recieverIDs, QString message){
    for(Connection* c: connections){
        for(QString id: recieverIDs){
            if(c->getID() == id){
-               qDebug() << "sending to " + id + ": " + message;
+               qDebug() << "[Server] sending to " + id + ": " + message;
                c->getSocket()->write(message.toLatin1());
            }//if IDs match
        }//for id in recieverIDs
@@ -133,7 +139,7 @@ void Server::sendMulticast(QList<QString> recieverIDs, QString message){
  * @param message
  */
 void Server::sendBoradcast(QString message){
-    qDebug() << "sending (Broadcast): " + message;
+    qDebug() << "[Server] sending (Broadcast): " + message;
     for(Connection* c: connections){
         c->getSocket()->write(message.toLatin1());
     }
@@ -146,7 +152,7 @@ void Server::sendBoradcast(QString message){
  */
 void Server::unsubscribe(QTcpSocket* socket){
 
-    qDebug() << "unsubscribing socket...";
+    qDebug() << "[Server] unsubscribing socket...";
 
     for(Connection* c: connections){
         if(c->getSocket() == socket){
