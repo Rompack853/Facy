@@ -6,6 +6,11 @@ Filesystem::Filesystem()
 
 }
 
+/**
+ * returns Singleton instance
+ * @brief Filesystem::getInstance
+ * @return
+ */
 Filesystem* Filesystem::getInstance(){
     static Filesystem* instance = nullptr;
 
@@ -23,7 +28,7 @@ Filesystem* Filesystem::getInstance(){
  */
 bool Filesystem::createNewGroupDir(QString groupName){
 
-    return mkDir("../resouce/groups/"+groupName.toLower());
+    return mkDir("../resource/groups/"+groupName.toLower());
 }
 
 /**
@@ -44,6 +49,22 @@ bool Filesystem::mkDir(QString dirPath){
     return success;
 }
 
+/**
+ * Checks if a path refers to a File
+ * @brief Filesystem::isFile
+ * @param path
+ * @return
+ */
+bool Filesystem::isFile(QString path){
+    return QFile::exists(path);
+}
+
+/**
+ * Removes a directory specified by the 'path' Parameter
+ * @brief Filesystem::rmDir
+ * @param dirPath
+ * @return
+ */
 bool Filesystem::rmDir(QString dirPath){
 
     bool success = dir.rmdir(dirPath+"/");
@@ -55,3 +76,22 @@ bool Filesystem::rmDir(QString dirPath){
 
     return success;
 }
+
+/**
+ * Returns a List of all images in the directory of the specified 'group' Parameter
+ * @brief Filesystem::loadImages
+ * @param group
+ * @return
+ */
+QList<QImage> Filesystem::loadImages(Group group){
+
+    QImage* image;
+
+    if(dir.cd("../resource/groups/" + group.getName().toLower())){
+        for(QString entry: dir.entryList(QDir::Files, QDir::SortFlag::NoSort)){
+            image->load(entry);
+        }
+    }
+
+
+}//loadImages()

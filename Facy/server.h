@@ -4,7 +4,11 @@
 #include "connection.h"
 #include "controller.h"
 
-class Server : public QObject
+#include <QTcpServer>
+#include <QSslKey>
+#include <QSslCertificate>
+
+class Server : public QTcpServer
 {
     Q_OBJECT
 
@@ -17,15 +21,20 @@ private slots:
 
     void buildConnection();
     void recieve(QObject* client);
+    void sslErrors(QList<QSslError> errors);
+    //void disconnected();
 
 private:
 
     Controller controller;
 
-    QTcpServer* server;
+    //QTcpServer* server;
     int port;
     QList<Connection*> connections;
     QSignalMapper* signalMapper;
+
+    QSslKey key;
+    QSslCertificate cert;
 
     Connection* searchConnection(QTcpSocket* socket);
 
@@ -34,7 +43,10 @@ private:
     void sendUnicast(QString recieverID, QString message);
     void sendMulticast(QList<QString> recieverIDs, QString message);
     void sendBoradcast(QString message);
-    void unsubscribe(QTcpSocket* socket);
+    void unsubscribe(QSslSocket* socket);
+
+protected:
+    void incomingConnection(qintptr socketDescriptor);
 };
 
 #endif // SERVER_H

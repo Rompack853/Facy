@@ -1,17 +1,42 @@
 #include "server.h"
 
+#include <QSslSocket>
+#include <QFile>
+
+/*
+ * Attention: Not all of the Code in this Class was written by the Team:
+ * Encryption with QSslSocket has been inspired by:
+ * https://github.com/jbagg/QSslSocket-example
+ * */
+
 /**
  * Construnctor
  * @brief Server::Server
  * @param parent
  * @param port
  */
-Server::Server(QObject* parent, int port) : QObject(parent){
+Server::Server(QObject* parent, int port) : QTcpServer(parent){
+
+    //loading the RSA-Private Key
+    QFile keyFile("../Encryption/red_local.key");
+    keyFile.open(QIODevice::ReadOnly);
+    key = QSslKey(keyFile.readAll(), QSsl::Rsa);
+    keyFile.close();
+
+    //loading the Certificate
+    QFile certFile("../Encryption/red_local.pem");
+    certFile.open(QIODevice::ReadOnly);
+    cert = QSslCertificate(certFile.readAll());
+    certFile.close();
+
+    /*if (!listen(QHostAddress("127.0.0.1"), port)) {
+        qCritical() << "Unable to start the TCP server";
+        exit(0);
+    }*/
 
     this->port = port;  //setzte Port
-    server = new QTcpServer(parent);    //erzeuge Server-Socket
-    connect(server, SIGNAL(newConnection()), this, SLOT(buildConnection())); //verbinde newConnection des QTcpSockets mit buildConnection() dieser Klasse
-    server->listen(QHostAddress::Any, port); //konfiguriere ip-adressen & empfangs-port fuer listener
+    connect(this, SIGNAL(newConnection()), this, SLOT(buildConnection())); //verbinde newConnection des QTcpSockets mit buildConnection() dieser Klasse
+    this->listen(QHostAddress::Any, port); //konfiguriere ip-adressen & empfangs-port fuer listener
     signalMapper = new QSignalMapper(this); //erzeuge Signalmapper
     connect(signalMapper, SIGNAL(mapped(QObject*)), this, SLOT(recieve(QObject*))); //verbinde mapped()-methode des SignalMappers mit recieve() dieser Klasse
 }
@@ -27,7 +52,7 @@ Server::~Server(){
         delete c;
     }//for c in connections
     connections.clear();
-    server->close();
+    this->close();
 }//destuctor
 
 //============SLOTS================0
@@ -39,8 +64,10 @@ Server::~Server(){
 void Server::buildConnection(){
     qDebug() << "[Server] building connection...";
 
-    QTcpSocket* client = server->nextPendingConnection();
+    QTcpSocket* client = this->nextPendingConnection();
     QString randomID = "";
+
+    //connect(client, SIGNAL(readyRead()), this, SLOT(recieve()));
 
     if(client){
         randomID = Connection::generateRandomID();
@@ -150,7 +177,7 @@ void Server::sendBoradcast(QString message){
  * @brief Server::unsubscribe
  * @param socket
  */
-void Server::unsubscribe(QTcpSocket* socket){
+void Server::unsubscribe(QSslSocket* socket){
 
     qDebug() << "[Server] unsubscribing socket...";
 
@@ -158,7 +185,48 @@ void Server::unsubscribe(QTcpSocket* socket){
         if(c->getSocket() == socket){
             socket->close();
             connections.removeAll(c);
-            delete socket;
+            delete c->getSocket();
         }//if
     }//for
 }
+
+/**
+ * @brief Server::incomingConnection
+ * @param socketDescriptor
+ */
+void Server::incomingConnection(qintptr socketDescriptor)
+{
+    QSslSocket *sslSocket = new QSslSocket(this);
+
+    connect(sslSocket, SIGNAL(sslErrors(QList<QSslError>)), this, SLOT(sslErrors(QList<QSslError>)));
+    sslSocket->setSocketDescriptor(socketDescriptor);
+    //sslSocket->setPrivateKey(key);
+    //sslSocket->setLocalCertificate(cert);
+
+    //See 'Configuring QSslSocket' on: https://doc.qt.io/qt-6/network-changes-qt6.html
+    auto sslConfiguration = QSslConfiguration::defaultConfiguration();
+    sslConfiguration.setPrivateKey(key);
+    sslConfiguration.setLocalCertificate(cert);
+    sslConfiguration.addCaCertificates("../Encryption/blue_ca.pem");
+    sslConfiguration.setPeerVerifyMode(QSslSocket::VerifyPeer);
+    sslSocket->setSslConfiguration(sslConfiguration);
+
+    //sslSocket->addCaCertificates("../Encryption/blue_ca.pem");
+    //sslSocket->setPeerVerifyMode(QSslSocket::VerifyPeer);
+    sslSocket->startServerEncryption();
+
+    addPendingConnection(sslSocket);
+}
+
+/**
+ * Prints error String to console
+ * @brief Server::sslErrors
+ * @param errors
+ */
+void Server::sslErrors(QList<QSslError> errors){
+    for(QSslError error: errors){
+        qDebug() << error.errorString();
+    }
+}
+
+//===================Call-Controller=====================

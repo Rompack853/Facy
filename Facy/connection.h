@@ -2,8 +2,6 @@
 #define CONNECTION_H
 
 #include <QtNetwork>
-#include <QCryptographicHash>
-
 class Connection
 {
 public:
