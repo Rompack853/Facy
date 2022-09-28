@@ -98,8 +98,13 @@ bool Filesystem::rmDir(QString dirPath){
 QList<QImage*> Filesystem::loadImages(Group* group){
 
     QList<QImage*> images;
+
+    if(group == nullptr)
+        return images;
+
     QImage* image;
     QString path = pathGroupDir + group->getName().toLower();
+
 
     if(dir.cd(path)){
         for(QString entry: dir.entryList(QDir::Files, QDir::SortFlag::NoSort)){
