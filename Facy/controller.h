@@ -11,22 +11,23 @@ public:
     ~Controller();
 
     //===========ADD-DATA================
-    void addUser(Role role, QString username, QString secret);          //FERTIG
-    void addGroup(QString name, QString dirPath, QString description);  //FERTIG
-    void addHighscore(QString username, QString groupname, int score);  //FERTIG
+    bool addUser(Role role, QString username, QString secret);          //FERTIG
+    bool addGroup(QString name, QString description);  //FERTIG
+    bool addHighscore(QString username, QString groupname, int score);  //FERTIG
 
-    //========LOAD-FROM-DATABASE=========
-    void loadUsers();                   //FERTIG
-    bool loadUser(QString username);    //FERTIG
-    void loadGroups();                  //FERTIG
-    bool loadHighscores();              //FERTIG
+    //=========GET-DATA=================
+    User* getUserByName(QString username); //FERTIG
+    Group* getGroupByName(QString name); //FERTIG
+    QList<Group*> getGroups(); //FERTIG
+    QList<User*> getUsers(); //FERTIG
 
-    //=========DELETE-DATA===============)
+    //=========DELETE-DATA===============
     void deleteUser(QString usernameToDelete, QString usernameExecuting); //IMPELMENT IF NEEDED
     void deleteGroup();                                                   //IMPELMENT IF NEEDED
     void deleteHighscore();                                               //IMPELMENT IF NEEDED
 
     //=========SECURITY=======
+    bool isAdmin(User* user);
 
     //=======NETWORKING=======
 
@@ -42,9 +43,11 @@ private:
     //==========FUNCTIONS=========
     void setup();
     void print(QString message); //FERTIG
-
-    User* getUserByName(QString username); //TODO Test
-    Group* getGroupByName(QString name); //TODO Test
+    //========LOAD-FROM-DATABASE=========
+    void loadUsers();                   //FERTIG
+    bool loadUser(QString username);    //FERTIG
+    void loadGroups();                  //FERTIG
+    bool loadHighscores();              //FERTIG
 };
 
 #endif // CONTROLLER_H

@@ -124,8 +124,8 @@ bool Database::addUser(User* user, Role role){
  */
 bool Database::addGroup(Group* group){
 
-    QString sqlBefehl = "INSERT INTO Stereotype (name, dir_path, description) "
-                        "VALUES ('" + group->getName() + "', '" + group->getDirPath() + "', '" + group->getDescription() + "');";
+    QString sqlBefehl = "INSERT INTO Stereotype (name, description) "
+                        "VALUES ('" + group->getName() + "', '" + group->getDescription() + "');";
 
     return execute(sqlBefehl);
 }
@@ -137,13 +137,42 @@ bool Database::addGroup(Group* group){
  */
 bool Database::addHighscore(Score* score){
 
+    bool success = false;
+
     QString sqlBefehl = "INSERT INTO Scoreboard (id_user, id_stereotype, highscore) "
                         "VALUES ( (SELECT id "
                                   "FROM User "
                                   "WHERE username = '"+ score->getUser()->getUsername() + "'), (SELECT id "
                                                                                                "FROM Stereotype "
                                                                                                "WHERE name = '" + score->getGroup()->getName() + "'), " + QString::number(score->getScore()) + ");";
-    return execute(sqlBefehl);
+    success = execute(sqlBefehl);
+
+    if(!success){
+        sqlBefehl = "UPDATE Scoreboard "
+                    "SET id_user=(SELECT id "
+                                 "FROM User "
+                                 "WHERE username = '"+ score->getUser()->getUsername() + "'), id_stereotype=(SELECT id "
+                                                                                                            "FROM Stereotype "
+                                                                                                            "WHERE name = '" + score->getGroup()->getName() + "'), highscore=" + QString::number(score->getScore()) + " "
+                    "WHERE id_stereotype = ( SELECT id "
+                                             "FROM Stereotype "
+                                             "WHERE name = '" + score->getGroup()->getName() + "');";
+        success = execute(sqlBefehl);
+    }//try to update on existing group
+    if(!success){
+        sqlBefehl = "UPDATE Scoreboard "
+                    "SET id_user=(SELECT id "
+                                 "FROM User "
+                                 "WHERE username = '"+ score->getUser()->getUsername() + "'), id_stereotype=(SELECT id "
+                                                                                                            "FROM Stereotype "
+                                                                                                            "WHERE name = '" + score->getGroup()->getName() + "'), highscore=" + QString::number(score->getScore()) + " "
+                    "WHERE id_user = ( SELECT id "
+                                      "FROM User "
+                                      "WHERE name = '" + score->getUser()->getUsername() + "');";
+        success = execute(sqlBefehl);
+    }//try to update on exisiting user
+
+    return success;
 }
 
 //===================GET-METHODS===================
@@ -270,12 +299,11 @@ QList<Group*> Database::loadGroups(){
     Group* group = nullptr; //cache for all group objects
     QString name = "";
     QString description = "";
-    QString dirPath = "";
     QList<Group*> groups; //Final List of groups that gets returnt in the end
 
     bool success = false;
     QSqlQuery qry;
-    QString sqlBefehl = "SELECT name, description, dir_path "
+    QString sqlBefehl = "SELECT name, description "
                         "FROM Stereotype;";
 
     qry.exec(sqlBefehl); //execute SQLStatement
@@ -283,8 +311,7 @@ QList<Group*> Database::loadGroups(){
     while (success) {
         name = qry.value(0).toString();         //loads the groups name
         description = qry.value(1).toString();  //loads the groups description
-        dirPath = qry.value(2).toString();      //loads the groups directory Path (more information in the Group class)
-        group = new Group(name, dirPath, description);
+        group = new Group(name, description);
         groups.append(group);
 
         success = qry.next();
@@ -312,7 +339,7 @@ Highscores* Database::loadHighscores(){
         success = qry.first();
         while(success){
             user = new User(qry.value(0).toString(), "");
-            group = new Group(qry.value(1).toString(), "", "");
+            group = new Group(qry.value(1).toString(), "");
             score = new Score(user, group, qry.value(2).toInt());
             highscores->addHighscore(score);
             success = qry.next();

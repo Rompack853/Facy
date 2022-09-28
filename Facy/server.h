@@ -27,26 +27,47 @@ private slots:
 private:
 
     Controller controller;
-
-    //QTcpServer* server;
-    int port;
+    //=======CONNECTION======
+    int port; //the port clients will connect to
     QList<Connection*> connections;
     QSignalMapper* signalMapper;
-
+    //=======CONNECTION======
+    //=======DATA-FLOW=======
+    QByteArray byteArr;
+    QDataStream* writer;
+    //=======SECURITY========
     QSslKey key;
     QSslCertificate cert;
+    //=======SECURITY========
 
-    Connection* searchConnection(QTcpSocket* socket);
+    Connection* searchConnection(QTcpSocket* socket);   //FERTIG
+    QList<QString> splitAtTilde(QString str);           //FERTIG
 
     //TODO Maybe you need to replace QString message with an Object later
-    void send(QTcpSocket* socket, QString message);
-    void sendUnicast(QString recieverID, QString message);
-    void sendMulticast(QList<QString> recieverIDs, QString message);
-    void sendBoradcast(QString message);
+    void send(QTcpSocket* socket, QString message);                 //FERTIG
+    void sendUnicast(QString recieverID, QString message);          //FERTIG
+    void sendMulticast(QList<QString> recieverIDs, QString message);//FERTIG
+    void sendBoradcast(QString message);                            //FERTIG
     void unsubscribe(QSslSocket* socket);
 
+    //========Controller-Get=========
+    void getGroups(QTcpSocket*, QString);       //TODO
+    void getHighscores(QTcpSocket*, QString);   //TODO
+    //========Server-Map=============
+    void getGroupImages(QTcpSocket*, QString);  //TODO
+    void createGroup(QTcpSocket*, QString);     //FERTIG
+    void createAdmin(QTcpSocket*, QString);     //FERTIG
+    void createUser(QTcpSocket*, QString);      //FERTIG
+    void addHighscore(QTcpSocket*, QString);    //FERTIG
+    //========Game-Logic=============
+    void guessName(QTcpSocket*, QString);       //TODO
+    //========Authentication=========
+    void authenticateUser(QTcpSocket*, QString);//TODO
+    //========Controller-Set=========
+
+
 protected:
-    void incomingConnection(qintptr socketDescriptor);
+    void incomingConnection(qintptr socketDescriptor); //FERTIG
 };
 
 #endif // SERVER_H

@@ -21,6 +21,18 @@ Filesystem* Filesystem::getInstance(){
 }
 
 /**
+ * Should convert an image into a format that can be sent through the Network
+ * source: https://forum.qt.io/topic/92641/converting-a-qimage-to-a-qbytearray-and-convert-it-back-into-an-image
+ * @brief Filesystem::toByteArray
+ * @param image
+ * @return
+ */
+QByteArray Filesystem::toByteArray(QImage* image){
+    //Test & replace with solution
+    return QByteArray::fromRawData((const char*)image->bits(), image->sizeInBytes());
+}
+
+/**
  * Creates a directory for a new Group
  * @brief Filesystem::createNewGroupDir
  * @param groupName
@@ -28,7 +40,7 @@ Filesystem* Filesystem::getInstance(){
  */
 bool Filesystem::createNewGroupDir(QString groupName){
 
-    return mkDir("../resource/groups/"+groupName.toLower());
+    return mkDir(pathGroupDir+groupName.toLower());
 }
 
 /**
@@ -83,15 +95,18 @@ bool Filesystem::rmDir(QString dirPath){
  * @param group
  * @return
  */
-QList<QImage> Filesystem::loadImages(Group group){
+QList<QImage*> Filesystem::loadImages(Group* group){
 
+    QList<QImage*> images;
     QImage* image;
+    QString path = pathGroupDir + group->getName().toLower();
 
-    if(dir.cd("../resource/groups/" + group.getName().toLower())){
+    if(dir.cd(path)){
         for(QString entry: dir.entryList(QDir::Files, QDir::SortFlag::NoSort)){
-            image->load(entry);
-        }
-    }
-
-
+            image = new QImage(entry);
+            image->load(path+"/"+entry);
+            images.append(image);
+        }//for
+    }//if
+    return images;
 }//loadImages()

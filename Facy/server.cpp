@@ -34,7 +34,9 @@ Server::Server(QObject* parent, int port) : QTcpServer(parent){
         exit(0);
     }*/
 
+    //writer = new QDataStream(&byteArr, QIODevice::WriteOnly);
     this->port = port;  //setzte Port
+
     connect(this, SIGNAL(newConnection()), this, SLOT(buildConnection())); //verbinde newConnection des QTcpSockets mit buildConnection() dieser Klasse
     this->listen(QHostAddress::Any, port); //konfiguriere ip-adressen & empfangs-port fuer listener
     signalMapper = new QSignalMapper(this); //erzeuge Signalmapper
@@ -91,6 +93,26 @@ void Server::recieve(QObject* client){
     QString input = socket->readAll();
 
     qDebug() << "[Server] recieved from ["+ tmpConnection->getID() +"]: " + input;
+
+    if(input.indexOf("GET_GROUPS")==0) {
+        getGroups(socket, input);
+    } else if(input.indexOf("GET_HIGHSCORES")==0) {
+        getHighscores(socket, input);
+    } else if(input.indexOf("GET_GROUP_IMAGES~")==0) {
+        getGroupImages(socket, input);
+    } else if(input.indexOf("CREATE_GROUP~")==0) {
+        createGroup(socket, input);
+    } else if(input.indexOf("CREATE_HIGHSCORE~")==0){
+        addHighscore(socket, input);
+    } else if(input.indexOf("CREATE_USER~")==0) {
+        createUser(socket, input);
+    } else if(input.indexOf("CREATE_ADMIN~")==0) {
+        createAdmin(socket, input);
+    } else if(input.indexOf("GUESS_NAME~")==0){
+        //TODO
+    } else if(input.indexOf("LOGIN~")==0){
+        authenticateUser(socket, input);
+    }
 
     //TODO Implement Actions that should happen on specific messages
 
@@ -226,7 +248,125 @@ void Server::incomingConnection(qintptr socketDescriptor)
 void Server::sslErrors(QList<QSslError> errors){
     for(QSslError error: errors){
         qDebug() << error.errorString();
-    }
+    }//for
 }
 
-//===================Call-Controller=====================
+//===================SERVER-Map==========================
+void Server::getGroupImages(QTcpSocket* socket, QString input){
+
+    //will get the group name specified after '~'
+    QString groupname = input.mid(input.indexOf("~")+1, input.length());
+
+    //loads the images from the filesystem of the group
+    //specified in the groupname
+    for(QImage* img: Filesystem::getInstance()->loadImages(controller.getGroupByName(groupname))){
+        //send each image converted as Bytearray to the Client
+        if(socket->write(Filesystem::toByteArray(img)) == -1){
+            qDebug() << "Error while sending image";
+        }//if
+    }//for
+    //inform the Client that all images have been send
+    send(socket, "IMGS_END");
+}//getGroupImages();
+
+void Server::getGroups(QTcpSocket* socket, QString input){
+
+    for(Group* g: controller.getGroups()){
+        g->getName();
+    }//for
+
+}//getGroups()
+
+void Server::getHighscores(QTcpSocket* socket, QString input){
+
+}//getHighscores()
+
+/**
+ * Adds a Group to the Game, if possible
+ * @brief Server::createGroup
+ * @param socket
+ * @param input
+ */
+void Server::createGroup(QTcpSocket* socket, QString input){
+    QList<QString> result = splitAtTilde(input);
+    if(!controller.addGroup(result.at(0), result.at(1))){
+        socket->write("CREATE_GROUP_FAILED");
+    }//if something went wrong while creating the Group
+}//createGroup()
+
+/**
+ * Adds an Admin to the Game if possible
+ * @brief Server::createAdmin
+ * @param socket
+ * @param input
+ */
+void Server::createAdmin(QTcpSocket* socket, QString input){
+    QList<QString> result = splitAtTilde(input);
+    if(!controller.addUser(Role::ADMIN, result.at(0), result.at(1))){
+        socket->write("CREATE_USER_FAILED");
+    }//if something went wrong while creating the Admin
+}//createAdmin()
+
+/**
+ * Adds an User to the Game if possible
+ * @brief Server::createUser
+ * @param socket
+ * @param input
+ */
+void Server::createUser(QTcpSocket* socket, QString input){
+    QList<QString> result = splitAtTilde(input);
+    if(!controller.addUser(Role::USER, result.at(0), result.at(1))){
+        socket->write("CREATE_USER_FAILED");
+    }//if something went wrong while creating the User
+}//createUser()
+
+/**
+ * Adds an Highscore to the Game if possible
+ * @brief Server::addHighscore
+ * @param socket
+ * @param input
+ */
+void Server::addHighscore(QTcpSocket* socket, QString input){
+    QList<QString> result = splitAtTilde(input);
+    if(!controller.addHighscore(result.at(0), result.at(1), result.at(2).toInt())){
+        socket->write("CREATE_HIGHSCORE_FAILED");
+    }//if something went wrong while creating the Highscore
+}//addHighscore()
+
+void Server::guessName(QTcpSocket* socket, QString input){
+    //TODO
+}//guessName()
+
+void Server::authenticateUser(QTcpSocket* socket, QString input){
+    QList<QString> result = splitAtTilde(input);
+    for(User* user: controller.getUsers()){
+        if(user->validateCredentials(result.at(0), result.at(1))){
+            if(dynamic_cast<Admin*>(user) != nullptr){
+                socket->write("LOGIN_CORRECT~admin");
+            } else {
+                socket->write("LOGIN_CORRECT~user");
+            }
+            return;
+        }//if user-credentials are correct
+    }//for user in users
+    socket->write("LOGIN_FAILED");
+}//authenticate()
+
+//=======MISC========
+QList<QString> Server::splitAtTilde(QString str){
+
+    QList<QString> strings;
+    int index;
+
+    while(str.contains("~")){
+        str = str.remove(0, str.indexOf("~")+1); //remove first part of string including the first ~
+        index = str.indexOf("~");
+        if(index >= 0)
+            strings.append(str.mid(0, index)); //stores the part of the String
+        else{
+            strings.append(str.mid(0, str.length()));
+            return strings;
+        }//else
+    }//while
+    return strings;
+}//splitAtTilde()

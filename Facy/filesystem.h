@@ -9,22 +9,27 @@ class Filesystem
 {
 public:
     static Filesystem* getInstance();
+    static QByteArray toByteArray(QImage*); //TODO!
 
-    static QByteArray toByteArray(QImage);
+    QList<QImage*> loadImages(Group*);
 
     bool createNewGroupDir(QString groupName);
     QString getFullPathOfDir(QString dirName);
 private:
 
     Filesystem();
+
     bool mkDir(QString dirPath);
     bool rmDir(QString dirPath);
 
     bool isDir(QString path);
     bool isFile(QString path);
 
-    QList<QImage> loadImages(Group);
+    //========Attributes==========
     QDir dir;
+    //========Static-Paths========
+    QString pathGroupDir = "../resource/groups/";
+
     //https://forum.qt.io/topic/50129/how-to-iterate-all-sub-folders-of-a-directory/4
 };
 

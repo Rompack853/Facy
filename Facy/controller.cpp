@@ -1,4 +1,5 @@
 #include "controller.h"
+#include "qlabel.h"
 
 /**
  * Constructor
@@ -28,6 +29,14 @@ void Controller::setup(){
     loadUsers();
     loadGroups();
     loadHighscores();
+
+    /* test for image-load: working!
+    for(Group* g: groups){
+        for(QImage* i: Filesystem::getInstance()->loadImages(g)){
+            qDebug()<<QString::number(i->width())+"px";
+        }//for
+    }//for */
+
 }
 
 //==============ADD-DATA================
@@ -39,12 +48,22 @@ void Controller::setup(){
  * @param username
  * @param secret
  */
-void Controller::addUser(Role role, QString username, QString secret){
+bool Controller::addUser(Role role, QString username, QString secret){
 
-    User* user = new User(username, secret);
+    if(getUserByName(username)!=nullptr){
+        return false;
+    }
+
+    User* user;
+
+    if(role == Role::USER){
+        user = new User(username, secret);
+    } else {
+        user = new Admin(username, secret);
+    }
     users.append(user);
-
     qDebug() << "Writing " << username << " to Database successful: " << database.addUser(user, role);
+    return true;
 }
 
 /**
@@ -54,11 +73,15 @@ void Controller::addUser(Role role, QString username, QString secret){
  * @param dirPath
  * @param description
  */
-void Controller::addGroup(QString name, QString dirPath, QString description){
+bool Controller::addGroup(QString name, QString description){
+
+    if(getGroupByName(name)!=nullptr){
+        return false;
+    }
 
     bool success = false;
 
-    Group* group = new Group(name, dirPath, description);
+    Group* group = new Group(name, description);
     groups.append(group);
 
     success = database.addGroup(group);
@@ -66,8 +89,10 @@ void Controller::addGroup(QString name, QString dirPath, QString description){
     qDebug() << "Writing " << name << " to Database successful: " << success;
 
     if(success){
-        Filesystem::getInstance()->createNewGroupDir(name);
+        if(Filesystem::getInstance()->createNewGroupDir(name))
+            return true;
     }//if adding Group to Database was successful -> create a directory for the groups images
+    return false;
 }
 
 /**
@@ -78,7 +103,7 @@ void Controller::addGroup(QString name, QString dirPath, QString description){
  * @param group
  * @param score
  */
-void Controller::addHighscore(QString username, QString groupname, int score){
+bool Controller::addHighscore(QString username, QString groupname, int score){
 
     User* user = getUserByName(username);
     Group* group = getGroupByName(groupname);
@@ -88,7 +113,7 @@ void Controller::addHighscore(QString username, QString groupname, int score){
        group != nullptr &&
        score > 0){
         if( highscores->addHighscore( scoreObj ) ){
-            qDebug() << "Writhing new Highscore of " << user->getUsername() << " to Database successful: " << database.addHighscore( scoreObj );  //add new Highscore to the Database
+            return database.addHighscore( scoreObj );  //add new Highscore to the Database
         }//if new highscore has been reached & set
         else{
             qDebug() << "Adding Highscore failed due to existing better scores";
@@ -97,6 +122,7 @@ void Controller::addHighscore(QString username, QString groupname, int score){
     else{
         qDebug()<<"addHighscore() canceled due to incorrect data";
     }
+    return false;
 }//addHighscore()
 
 //============GET-DATA============
@@ -112,22 +138,48 @@ User* Controller::getUserByName(QString username){
     loadUser(username); //tries to loadUser from DB (if it already got loaded the software notices it and stops automaticly)
 
     for(User* u: users){
-       if(u->getUsername()==username){
+       if(u->getUsername().toLower()==username.toLower()){
             return u;
        }//if
     }//for u
     return nullptr;
 }//getUserByName()
 
+/**
+ * Returns a group-object specified by the name
+ * @brief Controller::getGroupByName
+ * @param name
+ * @return
+ */
 Group* Controller::getGroupByName(QString name){
 
     for(Group* g: groups){
-        if(g->getName() == name){
+        if(g->getName().toLower() == name.toLower()){
             return g;
         }//if names match
     }//for g
     return nullptr;
 }//getGroupByName()
+
+/**
+ * returns all group-objects
+ * @brief Controller::getGroups
+ * @return
+ */
+QList<Group*> Controller::getGroups(){
+
+    return groups;
+}
+
+/**
+ * returns all user-objects
+ * @brief Controller::getUsers
+ * @return
+ */
+QList<User*> Controller::getUsers(){
+
+    return users;
+}
 
 //============LOAD-DATA===========
 
@@ -212,10 +264,9 @@ bool Controller::loadHighscores(){
 //===============================
 //===========SECURITY============
 //===============================
-
-bool checkUserCredentials(QString username, QString secret){
-    //TODO
-    return false;
+bool Controller::isAdmin(User* user){
+    //Admin* admin = dynamic_cast<Admin*>(user);
+    return true;
 }
 
 //============More================

@@ -13,7 +13,7 @@ public:
 
     bool validateCredentials(QString tryUsername, QString trySecret);
 
-    QString getUsername();
+    virtual QString getUsername();
     QString getSecret();
 
 protected:
