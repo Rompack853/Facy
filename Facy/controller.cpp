@@ -236,6 +236,11 @@ void Controller::loadGroups(){
     print("Groups loaded");
 }
 
+/**
+ * Loads the Highscores form the Database
+ * @brief Controller::loadHighscores
+ * @return
+ */
 bool Controller::loadHighscores(){
 
     highscores = database.loadHighscores();

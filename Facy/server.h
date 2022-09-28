@@ -62,7 +62,7 @@ private:
     //========Game-Logic=============
     void guessName(QTcpSocket*, QString);       //TODO
     //========Authentication=========
-    void authenticateUser(QTcpSocket*, QString);//TODO
+    void authenticateUser(QTcpSocket*, QString);//FERTIG
     //========Controller-Set=========
 
 

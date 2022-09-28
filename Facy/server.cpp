@@ -252,6 +252,12 @@ void Server::sslErrors(QList<QSslError> errors){
 }
 
 //===================SERVER-Map==========================
+/**
+ * Sends all images of a Group as single ByteArrays to the Client
+ * @brief Server::getGroupImages
+ * @param socket
+ * @param input
+ */
 void Server::getGroupImages(QTcpSocket* socket, QString input){
 
     //will get the group name specified after '~'
@@ -269,6 +275,12 @@ void Server::getGroupImages(QTcpSocket* socket, QString input){
     send(socket, "IMGS_END");
 }//getGroupImages();
 
+/**
+ * Returns all Groups split into single ?
+ * @brief Server::getGroups
+ * @param socket
+ * @param input
+ */
 void Server::getGroups(QTcpSocket* socket, QString input){
 
     for(Group* g: controller.getGroups()){
@@ -277,6 +289,12 @@ void Server::getGroups(QTcpSocket* socket, QString input){
 
 }//getGroups()
 
+/**
+ * Returns all Highscores split into single ...
+ * @brief Server::getHighscores
+ * @param socket
+ * @param input
+ */
 void Server::getHighscores(QTcpSocket* socket, QString input){
 
 }//getHighscores()
@@ -333,10 +351,22 @@ void Server::addHighscore(QTcpSocket* socket, QString input){
     }//if something went wrong while creating the Highscore
 }//addHighscore()
 
+/**
+ * Checks if the name guessed by the player was correct
+ * @brief Server::guessName
+ * @param socket
+ * @param input
+ */
 void Server::guessName(QTcpSocket* socket, QString input){
     //TODO
 }//guessName()
 
+/**
+ * authenticates an User via the credentials
+ * @brief Server::authenticateUser
+ * @param socket
+ * @param input
+ */
 void Server::authenticateUser(QTcpSocket* socket, QString input){
     QList<QString> result = splitAtTilde(input);
     for(User* user: controller.getUsers()){
@@ -353,6 +383,15 @@ void Server::authenticateUser(QTcpSocket* socket, QString input){
 }//authenticate()
 
 //=======MISC========
+/**
+ * Splits a Data-String into sperate Strings for each Datatype.
+ * If the Data got spereated by '~'.
+ * Returns a QList of QStrings containing the Data
+ *
+ * @brief Server::splitAtTilde
+ * @param str
+ * @return
+ */
 QList<QString> Server::splitAtTilde(QString str){
 
     QList<QString> strings;
