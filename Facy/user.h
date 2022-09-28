@@ -11,6 +11,8 @@ public:
     void setUsername(QString newUsername);
     void setSecret(QString newSecret);
 
+    bool validateCredentials(QString tryUsername, QString trySecret);
+
     QString getUsername();
     QString getSecret();
 

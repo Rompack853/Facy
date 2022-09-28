@@ -20,14 +20,16 @@ void User::setSecret(QString newSecret){
     this->secret = newSecret;
 }
 
-
 QString User::getUsername(){
 
     return this->username;
 }
 
-
 QString User::getSecret(){
     //Maybe unencrypt here
     return this->secret;
+}
+
+bool User::validateCredentials(QString tryUsername, QString trySecret){
+    return (tryUsername == this->username && trySecret == this->secret);
 }
